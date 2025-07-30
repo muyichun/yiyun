@@ -110,6 +110,12 @@ public class SecurityConfig
             // 注解标记允许匿名访问的url
             .authorizeHttpRequests((requests) -> {
                 permitAllUrl.getUrls().forEach(url -> requests.antMatchers(url).permitAll());
+                /**
+                // 使用 permitAll() 方法所有人都能访问，包括带上 token 访问
+                .antMatchers("/admins/**").permitAll()
+                        // 使用 anonymous() 所有人都能访问，但是带上 token 访问后会报错
+                        .antMatchers("/admins/**").anonymous()
+                 **/
                 // 对于登录login 注册register 验证码captchaImage 允许匿名访问
                 requests.antMatchers("/login", "/register", "/captchaImage").permitAll()
                     // 静态资源，可匿名访问
