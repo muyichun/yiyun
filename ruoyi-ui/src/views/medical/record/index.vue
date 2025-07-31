@@ -235,6 +235,7 @@
 
 <script>
 import { listAllRecords, listMyRecords, listDoctorRecords, getRecord, addRecord, updateRecord, delRecord, uploadAttachment, delAttachment } from "@/api/medical/record";
+import { getToken } from '@/utils/auth';
 
 export default {
   name: "MedicalRecord",
@@ -424,12 +425,52 @@ export default {
       }
     },
     downloadAttachment(attachment) {
-      const link = document.createElement('a');
-      link.href = process.env.VUE_APP_BASE_API + '/common/download?fileName=' + encodeURIComponent(attachment.filePath) + '&delete=' + false;
-      link.download = attachment.originalName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const token = getToken();
+      if (!token) {
+        this.$modal.msgError('用户未登录，请重新登录');
+        return;
+      }
+      
+      // 创建下载链接
+      const downloadUrl = process.env.VUE_APP_BASE_API + '/common/medicalDownload';
+      const params = {
+        fileName: attachment.filePath,
+        delete: false
+      };
+      
+      // 构建查询字符串
+      const queryString = Object.keys(params)
+        .map(key => `${key}=${encodeURIComponent(params[key])}`)
+        .join('&');
+      
+      // 使用fetch API来添加自定义headers
+      fetch(`${downloadUrl}?${queryString}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.blob();
+        }
+        throw new Error('下载失败');
+      })
+      .then(blob => {
+        // 创建下载链接
+        const url = window.URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = attachment.originalName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('下载失败:', error);
+        this.$modal.msgError('下载失败，请检查权限或联系管理员');
+      });
     },
     previewAttachment(attachment) {
       const fileType = attachment.fileType.toLowerCase();
