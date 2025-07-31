@@ -473,14 +473,96 @@ export default {
       });
     },
     previewAttachment(attachment) {
+      const token = getToken();
+      if (!token) {
+        this.$modal.msgError('用户未登录，请重新登录');
+        return;
+      }
+
       const fileType = attachment.fileType.toLowerCase();
+      
       if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
-        this.$alert('<img src="' + process.env.VUE_APP_BASE_API + '/' + attachment.filePath + '" style="max-width: 100%;">', '图片预览', {
-          dangerouslyUseHTMLString: true,
-          confirmButtonText: '关闭'
+        // 图片预览 - 使用fetch获取图片并创建blob URL
+        const imageUrl = process.env.VUE_APP_BASE_API + '/common/medicalDownload';
+        const params = {
+          fileName: attachment.filePath,
+          delete: false
+        };
+        
+        const queryString = Object.keys(params)
+          .map(key => `${key}=${encodeURIComponent(params[key])}`)
+          .join('&');
+        
+        fetch(`${imageUrl}?${queryString}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.blob();
+          }
+          throw new Error('获取图片失败');
+        })
+        .then(blob => {
+          const imageBlobUrl = window.URL.createObjectURL(blob);
+          this.$alert('<img src="' + imageBlobUrl + '" style="max-width: 100%;">', '图片预览', {
+            dangerouslyUseHTMLString: true,
+            confirmButtonText: '关闭',
+            callback: () => {
+              // 清理blob URL
+              window.URL.revokeObjectURL(imageBlobUrl);
+            }
+          });
+        })
+        .catch(error => {
+          console.error('预览失败:', error);
+          this.$modal.msgError('预览失败，请检查权限或联系管理员');
         });
       } else if (fileType === 'pdf') {
-        window.open(process.env.VUE_APP_BASE_API + '/' + attachment.filePath, '_blank');
+        // PDF预览 - 使用fetch获取PDF并创建blob URL
+        const pdfUrl = process.env.VUE_APP_BASE_API + '/common/medicalDownload';
+        const params = {
+          fileName: attachment.filePath,
+          delete: false
+        };
+        
+        const queryString = Object.keys(params)
+          .map(key => `${key}=${encodeURIComponent(params[key])}`)
+          .join('&');
+        
+        fetch(`${pdfUrl}?${queryString}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.blob();
+          }
+          throw new Error('获取PDF失败');
+        })
+        .then(blob => {
+          // 创建带有正确MIME类型的blob
+          const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+          const pdfBlobUrl = window.URL.createObjectURL(pdfBlob);
+          
+          // 使用iframe在新窗口中预览PDF
+          const newWindow = window.open('', '_blank');
+          newWindow.document.head.innerHTML = '<title>PDF预览</title><style>body{margin:0;padding:0}iframe{width:100%;height:100vh;border:none}</style>';
+          newWindow.document.body.innerHTML = `<iframe src="${pdfBlobUrl}#toolbar=1&navpanes=1&scrollbar=1" type="application/pdf"></iframe>`;
+          
+          // 延迟清理blob URL，给新窗口时间加载
+          setTimeout(() => {
+            window.URL.revokeObjectURL(pdfBlobUrl);
+          }, 10000);
+        })
+        .catch(error => {
+          console.error('预览失败:', error);
+          this.$modal.msgError('预览失败，请检查权限或联系管理员');
+        });
       } else {
         this.$modal.msgInfo("此文件类型不支持预览，请下载后查看");
       }
