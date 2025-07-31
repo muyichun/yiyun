@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DoctorInfoMapper">
+    
+    <resultMap type="DoctorInfo" id="DoctorInfoResult">
+        <result property="doctorId"    column="doctor_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="doctorNo"    column="doctor_no"    />
+        <result property="doctorName"    column="doctor_name"    />
+        <result property="gender"    column="gender"    />
+        <result property="birthDate"    column="birth_date"    />
+        <result property="phone"    column="phone"    />
+        <result property="email"    column="email"    />
+        <result property="department"    column="department"    />
+        <result property="title"    column="title"    />
+        <result property="specialty"    column="specialty"    />
+        <result property="education"    column="education"    />
+        <result property="licenseNo"    column="license_no"    />
+        <result property="workYears"    column="work_years"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectDoctorInfoVo">
+        select doctor_id, user_id, doctor_no, doctor_name, gender, birth_date, phone, email, department, title, specialty, education, license_no, work_years, del_flag, create_by, create_time, update_by, update_time, remark from doctor_info
+    </sql>
+
+    <select id="selectDoctorInfoList" parameterType="DoctorInfo" resultMap="DoctorInfoResult">
+        <include refid="selectDoctorInfoVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="doctorNo != null  and doctorNo != ''"> and doctor_no = #{doctorNo}</if>
+            <if test="doctorName != null  and doctorName != ''"> and doctor_name like concat('%', #{doctorName}, '%')</if>
+            <if test="gender != null  and gender != ''"> and gender = #{gender}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="department != null  and department != ''"> and department = #{department}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="specialty != null  and specialty != ''"> and specialty like concat('%', #{specialty}, '%')</if>
+            <if test="education != null  and education != ''"> and education = #{education}</if>
+            <if test="licenseNo != null  and licenseNo != ''"> and license_no = #{licenseNo}</if>
+            and del_flag = '0'
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectDoctorInfoByDoctorId" parameterType="Long" resultMap="DoctorInfoResult">
+        <include refid="selectDoctorInfoVo"/>
+        where doctor_id = #{doctorId} and del_flag = '0'
+    </select>
+
+    <select id="selectDoctorInfoByUserId" parameterType="Long" resultMap="DoctorInfoResult">
+        <include refid="selectDoctorInfoVo"/>
+        where user_id = #{userId} and del_flag = '0'
+    </select>
+        
+    <insert id="insertDoctorInfo" parameterType="DoctorInfo" useGeneratedKeys="true" keyProperty="doctorId">
+        insert into doctor_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="doctorNo != null and doctorNo != ''">doctor_no,</if>
+            <if test="doctorName != null and doctorName != ''">doctor_name,</if>
+            <if test="gender != null">gender,</if>
+            <if test="birthDate != null">birth_date,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="email != null and email != ''">email,</if>
+            <if test="department != null and department != ''">department,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="specialty != null and specialty != ''">specialty,</if>
+            <if test="education != null and education != ''">education,</if>
+            <if test="licenseNo != null and licenseNo != ''">license_no,</if>
+            <if test="workYears != null">work_years,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="doctorNo != null and doctorNo != ''">#{doctorNo},</if>
+            <if test="doctorName != null and doctorName != ''">#{doctorName},</if>
+            <if test="gender != null">#{gender},</if>
+            <if test="birthDate != null">#{birthDate},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="email != null and email != ''">#{email},</if>
+            <if test="department != null and department != ''">#{department},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="specialty != null and specialty != ''">#{specialty},</if>
+            <if test="education != null and education != ''">#{education},</if>
+            <if test="licenseNo != null and licenseNo != ''">#{licenseNo},</if>
+            <if test="workYears != null">#{workYears},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDoctorInfo" parameterType="DoctorInfo">
+        update doctor_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="doctorNo != null and doctorNo != ''">doctor_no = #{doctorNo},</if>
+            <if test="doctorName != null and doctorName != ''">doctor_name = #{doctorName},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="birthDate != null">birth_date = #{birthDate},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="email != null and email != ''">email = #{email},</if>
+            <if test="department != null and department != ''">department = #{department},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="specialty != null and specialty != ''">specialty = #{specialty},</if>
+            <if test="education != null and education != ''">education = #{education},</if>
+            <if test="licenseNo != null and licenseNo != ''">license_no = #{licenseNo},</if>
+            <if test="workYears != null">work_years = #{workYears},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where doctor_id = #{doctorId}
+    </update>
+
+    <delete id="deleteDoctorInfoByDoctorId" parameterType="Long">
+        update doctor_info set del_flag = '2' where doctor_id = #{doctorId}
+    </delete>
+
+    <delete id="deleteDoctorInfoByDoctorIds" parameterType="String">
+        update doctor_info set del_flag = '2' where doctor_id in 
+        <foreach item="doctorId" collection="array" open="(" separator="," close=")">
+            #{doctorId}
+        </foreach>
+    </delete>
+</mapper> 

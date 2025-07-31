@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MedicalRecordMapper">
+    
+    <resultMap type="MedicalRecord" id="MedicalRecordResult">
+        <result property="recordId"    column="record_id"    />
+        <result property="recordNo"    column="record_no"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="doctorId"    column="doctor_id"    />
+        <result property="visitDate"    column="visit_date"    />
+        <result property="visitType"    column="visit_type"    />
+        <result property="chiefComplaint"    column="chief_complaint"    />
+        <result property="presentIllness"    column="present_illness"    />
+        <result property="pastHistory"    column="past_history"    />
+        <result property="physicalExam"    column="physical_exam"    />
+        <result property="auxiliaryExam"    column="auxiliary_exam"    />
+        <result property="diagnosis"    column="diagnosis"    />
+        <result property="treatmentPlan"    column="treatment_plan"    />
+        <result property="prescription"    column="prescription"    />
+        <result property="followUpPlan"    column="follow_up_plan"    />
+        <result property="notes"    column="notes"    />
+        <result property="recordStatus"    column="record_status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <!-- 关联查询患者信息 -->
+        <association property="patientInfo" javaType="PatientInfo">
+            <result property="patientId" column="p_patient_id" />
+            <result property="patientNo" column="p_patient_no" />
+            <result property="patientName" column="p_patient_name" />
+            <result property="gender" column="p_gender" />
+            <result property="birthDate" column="p_birth_date" />
+            <result property="age" column="p_age" />
+            <result property="idCard" column="p_id_card" />
+            <result property="phone" column="p_phone" />
+            <result property="emergencyContact" column="p_emergency_contact" />
+            <result property="emergencyPhone" column="p_emergency_phone" />
+            <result property="address" column="p_address" />
+            <result property="bloodType" column="p_blood_type" />
+            <result property="allergyHistory" column="p_allergy_history" />
+            <result property="familyHistory" column="p_family_history" />
+            <result property="maritalStatus" column="p_marital_status" />
+            <result property="occupation" column="p_occupation" />
+            <result property="insuranceType" column="p_insurance_type" />
+            <result property="insuranceNo" column="p_insurance_no" />
+        </association>
+        <!-- 关联查询医生信息 -->
+        <association property="doctorInfo" javaType="DoctorInfo">
+            <result property="doctorId" column="d_doctor_id" />
+            <result property="doctorNo" column="d_doctor_no" />
+            <result property="doctorName" column="d_doctor_name" />
+            <result property="gender" column="d_gender" />
+            <result property="birthDate" column="d_birth_date" />
+            <result property="phone" column="d_phone" />
+            <result property="email" column="d_email" />
+            <result property="department" column="d_department" />
+            <result property="title" column="d_title" />
+            <result property="specialty" column="d_specialty" />
+            <result property="education" column="d_education" />
+            <result property="licenseNo" column="d_license_no" />
+            <result property="workYears" column="d_work_years" />
+        </association>
+    </resultMap>
+
+    <sql id="selectMedicalRecordVo">
+        select r.record_id, r.record_no, r.patient_id, r.doctor_id, r.visit_date, r.visit_type, r.chief_complaint, r.present_illness, r.past_history, r.physical_exam, r.auxiliary_exam, r.diagnosis, r.treatment_plan, r.prescription, r.follow_up_plan, r.notes, r.record_status, r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.remark,
+        p.patient_id as p_patient_id, p.patient_no as p_patient_no, p.patient_name as p_patient_name, p.gender as p_gender, p.birth_date as p_birth_date, p.age as p_age, p.id_card as p_id_card, p.phone as p_phone, p.emergency_contact as p_emergency_contact, p.emergency_phone as p_emergency_phone, p.address as p_address, p.blood_type as p_blood_type, p.allergy_history as p_allergy_history, p.family_history as p_family_history, p.marital_status as p_marital_status, p.occupation as p_occupation, p.insurance_type as p_insurance_type, p.insurance_no as p_insurance_no,
+        d.doctor_id as d_doctor_id, d.doctor_no as d_doctor_no, d.doctor_name as d_doctor_name, d.gender as d_gender, d.birth_date as d_birth_date, d.phone as d_phone, d.email as d_email, d.department as d_department, d.title as d_title, d.specialty as d_specialty, d.education as d_education, d.license_no as d_license_no, d.work_years as d_work_years
+        from medical_record r
+        left join patient_info p on r.patient_id = p.patient_id
+        left join doctor_info d on r.doctor_id = d.doctor_id
+    </sql>
+
+    <select id="selectMedicalRecordList" parameterType="MedicalRecord" resultMap="MedicalRecordResult">
+        <include refid="selectMedicalRecordVo"/>
+        <where>  
+            <if test="recordNo != null  and recordNo != ''"> and r.record_no = #{recordNo}</if>
+            <if test="patientId != null "> and r.patient_id = #{patientId}</if>
+            <if test="doctorId != null "> and r.doctor_id = #{doctorId}</if>
+            <if test="visitDate != null "> and r.visit_date = #{visitDate}</if>
+            <if test="visitType != null  and visitType != ''"> and r.visit_type = #{visitType}</if>
+            <if test="chiefComplaint != null  and chiefComplaint != ''"> and r.chief_complaint like concat('%', #{chiefComplaint}, '%')</if>
+            <if test="diagnosis != null  and diagnosis != ''"> and r.diagnosis like concat('%', #{diagnosis}, '%')</if>
+            <if test="recordStatus != null  and recordStatus != ''"> and r.record_status = #{recordStatus}</if>
+            and r.del_flag = '0'
+        </where>
+        order by r.create_time desc
+    </select>
+    
+    <select id="selectMedicalRecordByRecordId" parameterType="Long" resultMap="MedicalRecordResult">
+        <include refid="selectMedicalRecordVo"/>
+        where r.record_id = #{recordId} and r.del_flag = '0'
+    </select>
+
+    <select id="selectMyMedicalRecordList" parameterType="Long" resultMap="MedicalRecordResult">
+        <include refid="selectMedicalRecordVo"/>
+        where p.user_id = #{userId} and r.del_flag = '0'
+        order by r.create_time desc
+    </select>
+
+    <select id="selectDoctorMedicalRecordList" parameterType="Long" resultMap="MedicalRecordResult">
+        <include refid="selectMedicalRecordVo"/>
+        where d.user_id = #{userId} and r.del_flag = '0'
+        order by r.create_time desc
+    </select>
+        
+    <insert id="insertMedicalRecord" parameterType="MedicalRecord" useGeneratedKeys="true" keyProperty="recordId">
+        insert into medical_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recordNo != null and recordNo != ''">record_no,</if>
+            <if test="patientId != null">patient_id,</if>
+            <if test="doctorId != null">doctor_id,</if>
+            <if test="visitDate != null">visit_date,</if>
+            <if test="visitType != null">visit_type,</if>
+            <if test="chiefComplaint != null">chief_complaint,</if>
+            <if test="presentIllness != null">present_illness,</if>
+            <if test="pastHistory != null">past_history,</if>
+            <if test="physicalExam != null">physical_exam,</if>
+            <if test="auxiliaryExam != null">auxiliary_exam,</if>
+            <if test="diagnosis != null">diagnosis,</if>
+            <if test="treatmentPlan != null">treatment_plan,</if>
+            <if test="prescription != null">prescription,</if>
+            <if test="followUpPlan != null">follow_up_plan,</if>
+            <if test="notes != null">notes,</if>
+            <if test="recordStatus != null">record_status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="recordNo != null and recordNo != ''">#{recordNo},</if>
+            <if test="patientId != null">#{patientId},</if>
+            <if test="doctorId != null">#{doctorId},</if>
+            <if test="visitDate != null">#{visitDate},</if>
+            <if test="visitType != null">#{visitType},</if>
+            <if test="chiefComplaint != null">#{chiefComplaint},</if>
+            <if test="presentIllness != null">#{presentIllness},</if>
+            <if test="pastHistory != null">#{pastHistory},</if>
+            <if test="physicalExam != null">#{physicalExam},</if>
+            <if test="auxiliaryExam != null">#{auxiliaryExam},</if>
+            <if test="diagnosis != null">#{diagnosis},</if>
+            <if test="treatmentPlan != null">#{treatmentPlan},</if>
+            <if test="prescription != null">#{prescription},</if>
+            <if test="followUpPlan != null">#{followUpPlan},</if>
+            <if test="notes != null">#{notes},</if>
+            <if test="recordStatus != null">#{recordStatus},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMedicalRecord" parameterType="MedicalRecord">
+        update medical_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="recordNo != null and recordNo != ''">record_no = #{recordNo},</if>
+            <if test="patientId != null">patient_id = #{patientId},</if>
+            <if test="doctorId != null">doctor_id = #{doctorId},</if>
+            <if test="visitDate != null">visit_date = #{visitDate},</if>
+            <if test="visitType != null">visit_type = #{visitType},</if>
+            <if test="chiefComplaint != null">chief_complaint = #{chiefComplaint},</if>
+            <if test="presentIllness != null">present_illness = #{presentIllness},</if>
+            <if test="pastHistory != null">past_history = #{pastHistory},</if>
+            <if test="physicalExam != null">physical_exam = #{physicalExam},</if>
+            <if test="auxiliaryExam != null">auxiliary_exam = #{auxiliaryExam},</if>
+            <if test="diagnosis != null">diagnosis = #{diagnosis},</if>
+            <if test="treatmentPlan != null">treatment_plan = #{treatmentPlan},</if>
+            <if test="prescription != null">prescription = #{prescription},</if>
+            <if test="followUpPlan != null">follow_up_plan = #{followUpPlan},</if>
+            <if test="notes != null">notes = #{notes},</if>
+            <if test="recordStatus != null">record_status = #{recordStatus},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where record_id = #{recordId}
+    </update>
+
+    <delete id="deleteMedicalRecordByRecordId" parameterType="Long">
+        update medical_record set del_flag = '2' where record_id = #{recordId}
+    </delete>
+
+    <delete id="deleteMedicalRecordByRecordIds" parameterType="String">
+        update medical_record set del_flag = '2' where record_id in 
+        <foreach item="recordId" collection="array" open="(" separator="," close=")">
+            #{recordId}
+        </foreach>
+    </delete>
+</mapper> 

@@ -161,6 +161,22 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
+  },
+  {
+    path: '/medical',
+    component: Layout,
+    hidden: false,
+    redirect: 'noredirect',
+    name: 'Medical',
+    meta: { title: '病历档案', icon: 'documentation' },
+    children: [
+      {
+        path: 'record',
+        component: () => import('@/views/medical/record/index'),
+        name: 'MedicalRecord',
+        meta: { title: '病历管理', icon: 'list' }
+      }
+    ]
   }
 ]
 
